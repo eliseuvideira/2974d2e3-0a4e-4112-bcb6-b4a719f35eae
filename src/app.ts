@@ -15,7 +15,7 @@ export const AppBuilder = async (context: Context) =>
         handler: async (error) => {
           return {};
         },
-      }
+      },
     ],
     context,
   });
