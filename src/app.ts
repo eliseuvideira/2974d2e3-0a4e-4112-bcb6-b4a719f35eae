@@ -10,6 +10,12 @@ export const AppBuilder = async (context: Context) =>
         name: context.config.RABBITMQ_QUEUE,
         handler,
       },
+      {
+        name: "example",
+        handler: async (error) => {
+          return {};
+        },
+      }
     ],
     context,
   });
