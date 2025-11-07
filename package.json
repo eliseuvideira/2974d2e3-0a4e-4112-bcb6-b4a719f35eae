@@ -1,0 +1,40 @@
+{
+  "name": "2974d2e3-0a4e-4112-bcb6-b4a719f35eae",
+  "version": "1.0.0",
+  "description": "Finch API version checker demo using RabbitMQ",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "build:check": "tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint --write .",
+    "lint:check": "biome lint .",
+    "start": "node dist/main.js",
+    "start:dev": "ts-node src/main.ts",
+    "test": "jest",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.4",
+    "@types/amqplib": "^0.10.8",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@42357b89-db02-462c-ad63-d35ca7e5367c/logger": "^0.4.0",
+    "@42357b89-db02-462c-ad63-d35ca7e5367c/rabbitmq-app": "^0.2.0",
+    "amqplib": "^0.10.9",
+    "dotenv": "^17.2.3",
+    "zod": "^4.1.12"
+  }
+}
