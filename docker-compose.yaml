@@ -1,83 +1,121 @@
 services:
-  grafana:
-    image: grafana/grafana:latest
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #     - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #     - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQlStreaming metricsSummary
+  #   ports:
+  #     - '3000:3000'
+  #   networks:
+  #     - observability
+  #   restart: always
+  #   volumes:
+  #     - grafana-storage:/var/lib/grafana
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - '9090:9090'
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--storage.tsdb.retention.time=15d'
+  #   volumes:
+  #     - prometheus-storage:/prometheus
+  #     - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+  #     - ./rules.yaml:/etc/prometheus/rules.yaml:ro
+  #   restart: always
+  #   networks:
+  #     - observability
+
+  # alertmanager:
+  #   image: prom/alertmanager:latest
+  #   command:
+  #     - --config.file=/etc/alertmanager/alertmanager.yml
+  #     - --storage.path=/alertmanager
+  #     - --web.external-url=http://alertmanager:9093
+  #   ports:
+  #     - 9093:9093
+  #   volumes:
+  #     - ./alertmanager.yaml:/etc/alertmanager/alertmanager.yml
+  #     - alertmanager-storage:/alertmanager
+  #   restart: always
+  #   networks:
+  #     - observability
+
+  # pushgateway:
+  #   image: prom/pushgateway:latest
+  #   ports:
+  #     - '9091:9091'
+  #   restart: always
+  #   networks:
+  #     - observability
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - '5672:5672'
+  #     - '15672:15672'
+  #     - '15692:15692'
+  #   environment:
+  #     - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management prometheus_metrics
+  #   volumes:
+  #     - rabbitmq-storage:/var/lib/rabbitmq
+  #   restart: always
+  #   healthcheck:
+  #     test: ['CMD', 'rabbitmq-diagnostics', 'check_port_connectivity']
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   networks:
+  #     - observability
+
+  nats:
+    image: nats:latest
+    command: '-js -sd /data'
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+    restart: always
+    networks:
+      - observability
+
+  nats-box:
+    image: natsio/nats-box:latest
+    command: sleep infinity
+    depends_on:
+      - nats
+    networks:
+      - observability
+
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - '4566:4566'
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
-      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQlStreaming metricsSummary
-    ports:
-      - '3000:3000'
-    networks:
-      - observability
-    restart: always
+      - SERVICES=sqs
+      - DEBUG=1
     volumes:
-      - grafana-storage:/var/lib/grafana
-
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - '9090:9090'
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=15d'
-    volumes:
-      - prometheus-storage:/prometheus
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-      - ./rules.yaml:/etc/prometheus/rules.yaml:ro
+      - localstack-storage:/var/lib/localstack
     restart: always
     networks:
       - observability
 
-  alertmanager:
-    image: prom/alertmanager:latest
-    command:
-      - --config.file=/etc/alertmanager/alertmanager.yml
-      - --storage.path=/alertmanager
-      - --web.external-url=http://alertmanager:9093
+  redis:
+    image: redis:latest
     ports:
-      - 9093:9093
-    volumes:
-      - ./alertmanager.yaml:/etc/alertmanager/alertmanager.yml
-      - alertmanager-storage:/alertmanager
+      - '6380:6379'
     restart: always
-    networks:
-      - observability
-
-  pushgateway:
-    image: prom/pushgateway:latest
-    ports:
-      - '9091:9091'
-    restart: always
-    networks:
-      - observability
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-      - '15692:15692'
-    environment:
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management prometheus_metrics
-    volumes:
-      - rabbitmq-storage:/var/lib/rabbitmq
-    restart: always
-    healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', 'check_port_connectivity']
-      interval: 30s
-      timeout: 10s
-      retries: 5
     networks:
       - observability
 
 networks:
   observability:
-
 volumes:
-  grafana-storage:
-  prometheus-storage:
-  alertmanager-storage:
-  rabbitmq-storage:
+  localstack-storage:
+# grafana-storage:
+# prometheus-storage:
+# alertmanager-storage:
+# rabbitmq-storage:
